@@ -52,7 +52,6 @@ class main {
       }
 
       theirActions();
-      myActions();
 
       System.err.println("End of turn " + turn + ".");
 
@@ -88,10 +87,6 @@ class main {
     }
   }
 
-  public static void myActions() {
-
-  }
-
   public static int[] interpretPos(String str) {
     char[] charArray = {str.charAt(0),str.charAt(1)};
     int[] pos = new int[2];
@@ -125,8 +120,14 @@ class main {
     return dir;
   }
 
-  public static checkAttacked () {
-
+  public static checkAttacked (int[] pos) {
+    if (hasMyShip(pos)) {
+      hitAttacked(pos);
+    } else if (nearMyShip(pos)) {
+      nearAttacked(pos);
+    } else if (missMyShip(pos)) {
+      missAttacked(pos);
+    }
   }
 
   public static int totalHP(Battleship[] team) {
