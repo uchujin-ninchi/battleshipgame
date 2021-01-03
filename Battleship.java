@@ -16,4 +16,9 @@ public class Battleship {
         this.posY = startY;
         this.map = map;
     }
+
+    setPos (int[2] pos) {
+      this.posX = pos[0];
+      this.posY = pos[1];
+    }
 }
