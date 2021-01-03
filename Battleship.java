@@ -17,8 +17,29 @@ public class Battleship {
         this.map = map;
     }
 
-    setPos (int[2] pos) {
+    public void setPos (int[] pos) {
       this.posX = pos[0];
       this.posY = pos[1];
     }
+
+    public void setMap (Masu map) {
+      this.map = map;
+    }
+
+    public void setHP (int HP) {
+      this.HP = HP;
+    }
+
+    public void attacked () {
+
+    }
+
+    public void attack () {
+
+    }
+
+    public void fleet () {
+
+    }
+
 }
