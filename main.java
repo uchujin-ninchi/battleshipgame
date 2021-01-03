@@ -104,7 +104,7 @@ class main {
       String direction = sc.nextLine();
       int[] movedDirection = interpretDirection(direction);
 
-      
+
     }
   }
 
@@ -194,10 +194,10 @@ class main {
   public static void counterNearAttack (int[] pos) {
     int pattern = int(2*Math.random());
     lastCounterNearPattern[1]=pattern;
-    int[][] setdSIDE = {surrounding[2], surrounding[4], surrounding[5], surrounding[7]};
+    int[][] setdSIDE = {MasuData.surrounding[2], MasuData.surrounding[4], MasuData.surrounding[5], MasuData.surrounding[7]};
     int[][] setPosSIDE = setSurroundingPos(pos, setdSIDE, 4);
 
-    int[] setdCORNER = {surrounding[1], surrounding[3], surrounding[6], surrounding[8]};
+    int[] setdCORNER = {MasuData.surrounding[1], MasuData.surrounding[3], MasuData.surrounding[6], MasuData.surrounding[8]};
     int[][] setPosCORNER = setSurroundingPos(pos, setdCORNER, 4);
 
     attacked = 0;
@@ -220,8 +220,8 @@ class main {
     boolean ans = false;
     for (int i=0; i<8; i++) {
       int[] checkPos = new int[2];
-      checkPos[0] = pos[0]+surrounding[i][0];
-      checkPos[1] = pos[1]+surrounding[i][1];
+      checkPos[0] = pos[0]+MasuData.surrounding[i][0];
+      checkPos[1] = pos[1]+MasuData.surrounding[i][1];
       if (hasMyShip(checkPos)) {
         ans = true;
         break;
@@ -268,7 +268,7 @@ class main {
   public static void fleeFromNearAttack (pos) {
     lastCounterNearPattern[0] = TYPE_FLEE;
 
-    int[][] surroundingPos = setSurroundingPos(pos, surrounding, 8);
+    int[][] surroundingPos = setSurroundingPos(pos, MasuData.surrounding, 8);
     ArrayList<int> nearShip = new ArrayList<int>();
     for (int i=0; i<8; i++) {
       if (myMap.getMap(surroundingPos[i][0],surroundingPos[i][1]) == 1) {
@@ -300,7 +300,7 @@ class main {
   }
 
   public static void fleeAfterMissedAttacked () {
-    int[][] surroundingPos = setSurroundingPos(pos, surrounding, 8);
+    int[][] surroundingPos = setSurroundingPos(pos, MasuData.surrounding, 8);
     ArrayList<int> nearShip = new ArrayList<int>();
     for (int i=0; i<8; i++) {
       if (myMap.getMap(surroundingPos[i][0],surroundingPos[i][1]) == 1) {
