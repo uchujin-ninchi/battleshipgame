@@ -5,7 +5,6 @@ public class MasuData implements Initializable {
     private int[][] map;
     private int width;
     private int height;
-    private int availablility;  //count if ship is there
     private int ships;
 
     MasuData (int width, int height) {
