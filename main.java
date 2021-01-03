@@ -9,6 +9,7 @@ class main {
   public static final int POS_C = 2;
   public static final int POS_D = 3;
   public static final int POS_E = 4;
+  
 
   public static Masu myMap;
   public static Masu theirMap;
@@ -22,6 +23,7 @@ class main {
                                           {POS_A,4},
                                           {POS_E,0},
                                           {POS_E,4}};
+
 
   public static void initialize() {
     myMap = new Masu(5, 5);
@@ -130,14 +132,13 @@ class main {
     }
   }
 
-  public static hasMyShip (int[][] maps) {
-    maps = new int[5][5];
-    boolean check = false;
-    for(int i = 0; i < map.length;i++){
-      for(int j = 0; j< mao.length; j++){
-        if(StartPos[i][j] == map[i][j]{
+  public static hasMyShip (boolean check) {
+    check = false;
+    for(int i = 0; i < myMap.length; i++){
+      for(int j  =0; j <myMap.length; j++){
+        if(myMap[i][j] == 1){
           check = true;
-        }
+      }
     }
     if(check == true){
       System.out.println("命中！");
@@ -146,10 +147,32 @@ class main {
       check = false;
     }
   }
-  public static hitAttracked (int[][] maps) {
-    maps = newInt
-  }
-  public static int totalHP(Battleship[] team) {
+  public static hitAttracked () {
+    int[] k = {0,1};
+    Random r = new Random();
+    int j = r.nextRandom(k.length);
+    int []rd = {1,2,-1,-2, 3, -3);
+    int []m ={0,1};
+    int m1 = r.nextRandom(m.lenght);
+    int n = r.nextRandom(rd.length);
+    if(j ==0){
+      setMapAll(myShips, myMap);
+    }else{
+      x = x + m;
+      for(int i = 0; i < myMap.length; i++){
+      for(int j  =0; j <myMap.length; j++){
+        if(myMap[i][j] == 1){
+          myMap[i][j] = 0;
+          if(m1 == 0){
+           myMap[i][j+n] = 1;
+          }else{
+           myMap[i+m][j] = 1;
+          setMapAll(myShips, myMap);
+        }
+      }
+     }
+    }
+    setMapAll(myShips, myMap);  public static int totalHP(Battleship[] team) {
     int teamHP = 0;
     for (int i=0; i<4; i++) {
       teamHP += team[i].getHP;
