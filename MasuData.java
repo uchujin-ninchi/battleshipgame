@@ -1,6 +1,9 @@
 public class MasuData implements Initializable {
     public static final int TYPE_VOID = 0;
     public static final int TYPE_SHIP = 1;
+    public static final int[][] surrounding = { {-1,-1}, {0,-1}, {1,-1},
+                                                {-1, 0},         {1, 0},
+                                                {-1, 1}, {0, 1}, {1, 1} };
 
     private int[][] map;
     private int width;
@@ -27,8 +30,13 @@ public class MasuData implements Initializable {
     public int getAv(int x, int y) {
         return AvMap[y][x];
     }
-    public void setAv(int x, int y, int count){
-        AvMap[y][x] = count;
+    public void raiseAv(int x, int y, int count){
+        AvMap[y][x] += count;
+    }
+    public void raiseSurroundingsAv(int x, int y, int count){
+        for (int i=0; i<8; i++){
+            AvMap[y+MasuData.surrounding[i][1]][x+MasuData.surrounding[i][0]] += count;
+        }
     }
     
     public void fillShipData(int type){
@@ -42,7 +50,7 @@ public class MasuData implements Initializable {
     public void fillAvMap(int type){
         for (int y=0; y<height; y++){
             for (int x=0; x<width; x++){
-                map[y][x] = type;
+                AvMap[y][x] = type;
             }
         }
     }
