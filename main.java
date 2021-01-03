@@ -1,15 +1,16 @@
 import java.util.Scanner;
-class main implements Initializable {
-  public Masu map;
-  public Battleship[] ships;
+class main {
+  public static Masu myMap;
+  public static Masu theirMap;
+  public static Battleship[] myShips;
+  public static Battleship[] theirShips;
 
   public static final int[][] startPos = {{0,0},
                                           {0,4},
                                           {4,0},
                                           {4,4}};
 
-  @Override
-  public void initialize(URL url, ResourceBundle rb) {
+  public static void initialize() {
     myMap = new Masu(5, 5);
     theirMap = new Masu(5, 5);
 
@@ -24,11 +25,11 @@ class main implements Initializable {
     setMapAll(theirShips, theirMap);
   }
 
-  static public void main (String arg[]) {
-
+  public static void main (String arg[]) {
+    initialize();
   }
 
-  public void setMapAll (Battleship[4] team, Masu map) {
+  public static void setMapAll (Battleship[] team, Masu map) {
     for (int i=0; i<4; i++) {
       team[i].setMap(map);
     }
