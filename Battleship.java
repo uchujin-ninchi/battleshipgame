@@ -37,19 +37,24 @@ public class Battleship {
       this.HP = HP;
     }
     public int getHP () {
-      return this.Hp;
+      return this.HP;
     }
-
-    public void attacked () {
+    public void Setattacked () {
+ 
+    }
+    public void SetSide(){
         
     }
+    public void Getattacked(){
+        return this.HP;
+    }
 
-    public void attack () {
+    public void Setattack () {
 
     }
 
-    public void fleet () {
-
+    public void Setflee () {
+        
     }
 
 }
