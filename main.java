@@ -130,6 +130,25 @@ class main {
     }
   }
 
+  public static hasMyShip (int[][] maps) {
+    maps = new int[5][5];
+    boolean check = false;
+    for(int i = 0; i < map.length;i++){
+      for(int j = 0; j< mao.length; j++){
+        if(StartPos[i][j] == map[i][j]{
+          check = true;
+        }
+    }
+    if(check == true){
+      System.out.println("命中！");
+      
+    }else{
+      check = false;
+    }
+  }
+  public static hitAttracked (int[][] maps) {
+    maps = newInt
+  }
   public static int totalHP(Battleship[] team) {
     int teamHP = 0;
     for (int i=0; i<4; i++) {
