@@ -304,12 +304,7 @@ class main {
     ArrayList<int> nearShip = new ArrayList<int>();
     for (int i=0; i<8; i++) {
       if (myMap.getMap(surroundingPos[i][0],surroundingPos[i][1]) == 1) {
-        for (int j=0; j<4; j++) {
-          if (myShips[j].getPos[0] == surroundingPos[i][0] && myShips[j].getPos[1] == surroundingPos[i][1]) {
-            nearShip.add(j);
-            break;
-          }
-        }
+        nearShip.add(checkWhichShip(surroundingPos[i]))
       }
     }
   }
@@ -368,5 +363,16 @@ class main {
       newPos[i][1]=pos[1]+dPos[i][1];
     }
     return newPos;
+  }
+
+  public static int checkWhichShip (int[] pos) {
+    int ans=0;
+    for (int j=0; j<4; j++) {
+      if (myShips[j].getPos[0] == surroundingPos[i][0] && myShips[j].getPos[1] == surroundingPos[i][1]) {
+        ans = i;
+        break;
+      }
+    }
+    return ans;
   }
 }
