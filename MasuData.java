@@ -33,12 +33,7 @@ public class MasuData implements Initializable {
     public void raiseAv(int x, int y, int count){
         AvMap[y][x] += count;
     }
-    public void raiseSurroundingsAv(int x, int y, int count){
-        for (int i=0; i<8; i++){
-            AvMap[y+MasuData.surrounding[i][1]][x+MasuData.surrounding[i][0]] += count;
-        }
-    }
-    
+
     public void fillShipData(int type){
         for (int y=0; y<height; y++){
             for (int x=0; x<width; x++){
