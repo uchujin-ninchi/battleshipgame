@@ -39,22 +39,24 @@ public class Battleship {
     public int getHP () {
       return this.HP;
     }
-    public void Setattacked () {
- 
-    }
-    public void SetSide(){
-        
-    }
-    public void Getattacked(){
-        return this.HP;
-    }
 
-    public void Setattack () {
-
+    public static void flee (int desX, int desY) {
+        if (isMovable(desX, desY)) {
+            this.getMap.setMap(this.posX,this.posY) == MasuData.TYPE_VOID;
+            this.setPos({desX, desY});
+            this.getMap.setMap(desX,desY) == MasuData.TYPE_SHIP;
+        }
     }
-
-    public void Setflee () {
-        
+    
+    public boolean isMovable(int newX, int newY){
+        if (newX >= MAP_SIZE || newY >= MAP_SIZE || newX < 0 || newY < 0 ){
+            return false;
+        } else if (this.getMap.getMap(newX, newY) == MasuData.TYPE_SHIP){
+            return false;
+        } else {
+            return true;
+        }
+        return false;
     }
 
 }
