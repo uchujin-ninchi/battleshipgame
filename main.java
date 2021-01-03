@@ -4,19 +4,24 @@ import java.util.ArrayList;
 class main {
   public static final int TYPE_ATTACK = 1;
   public static final int TYPE_FLEE = 0;
+  public static final int POS_A = 0;
+  public static final int POS_B = 1;
+  public static final int POS_C = 2;
+  public static final int POS_D = 3;
+  public static final int POS_E = 4;
 
   public static Masu myMap;
   public static Masu theirMap;
   public static Battleship[] myShips;
   public static Battleship[] theirShips;
-  public static ArrayList<int[]> theyAttacked;  
+  public static ArrayList<int[]> theyAttacked;
   public static ArrayList<int[]> weAttacked;
   public static int winner = 0;
 
-  public static final int[][] startPos = {{0,0},
-                                          {0,4},
-                                          {4,0},
-                                          {4,4}};
+  public static final int[][] startPos = {{POS_A,0},
+                                          {POS_A,4},
+                                          {POS_E,0},
+                                          {POS_E,4}};
 
   public static void initialize() {
     myMap = new Masu(5, 5);
@@ -71,15 +76,56 @@ class main {
     int action = sc.nextInt;
     if (action == TYPE_ATTACK) {
       System.err.print("They attacked ");
-      String atkPos = sc.next();
-      interpretPos(atkPos);
+      String atkPosStr = sc.nextLine();
+      int[] atkPos = interpretPos(atkPosStr);
+      theyAttacked.add(atkPos);
+      checkAttacked(atkPos);
 
     } else if (action == TYPE_FLEE) {
-
+      System.err.print("They moved (N/S/E/W + num) ");
+      String direction = sc.nextLine();
+      int[] movedDirection = interpretDirection(direction);
     }
   }
 
   public static void myActions() {
+
+  }
+
+  public static int[] interpretPos(String str) {
+    char[] charArray = {str.charAt(0),str.charAt(1)};
+    int[] pos = new int[2];
+    if (charArray[0] == 'A') {
+      pos[0] = POS_A;
+    } else if (charArray[0] == 'B') {
+      pos[0] = POS_B;
+    } else if (charArray[0] == 'C') {
+      pos[0] = POS_C;
+    } else if (charArray[0] == 'D') {
+      pos[0] = POS_D;
+    } else if (charArray[0] == 'E') {
+      pos[0] = POS_E;
+    }
+    pos[1] = Character.getNumericValue(charArray[1]);
+    return pos;
+  }
+
+  public static int [] interpretDirection(String str) {
+    char[] charArray = {str.charAt(0),str.charAt(1)};
+    int[] dir = new int[2];
+    if (charArray[0] == 'N') {
+      dir[1] = 0 - Character.getNumericValue(charArray[1]);
+    } else if (charArray[0] == 'S') {
+      dir[1] = Character.getNumericValue(charArray[1]);
+    } else if (charArray[0] == 'E') {
+      dir[0] = 0 - Character.getNumericValue(charArray[1]);
+    } else if (charArray[0] == 'W') {
+      dir[0] = Character.getNumericValue(charArray[1]);
+    }
+    return dir;
+  }
+
+  public static checkAttacked () {
 
   }
 
