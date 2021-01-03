@@ -10,16 +10,27 @@ class main implements Initializable {
 
   @Override
   public void initialize(URL url, ResourceBundle rb) {
-    mapThis = new Masu(5, 5);
-    mapOppo = new Masu(5, 5);
+    myMap = new Masu(5, 5);
+    theirMap = new Masu(5, 5);
+
     myShips = new Battleship[4];
     theirShips = new Battleship[4];
+
     for (int i = 0; i<4; i++) {
       myShips[i].setPos(startPos[i]);
     }
+
+    setMapAll(myShips, myMap);
+    setMapAll(theirShips, theirMap);
   }
 
   static public void main (String arg[]) {
 
+  }
+
+  public void setMapAll (Battleship[4] team, Masu map) {
+    for (int i=0; i<4; i++) {
+      team[i].setMap(map);
+    }
   }
 }
