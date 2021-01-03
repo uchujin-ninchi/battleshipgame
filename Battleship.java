@@ -21,17 +21,27 @@ public class Battleship {
       this.posX = pos[0];
       this.posY = pos[1];
     }
+    public int[] getPos () {
+      int[] pos = {this.posX, this.posY};
+      return pos;
+    }
 
     public void setMap (Masu map) {
       this.map = map;
+    }
+    public Masu getMap(){
+        return this.map;
     }
 
     public void setHP (int HP) {
       this.HP = HP;
     }
+    public int getHP () {
+      return this.Hp;
+    }
 
     public void attacked () {
-
+        
     }
 
     public void attack () {
