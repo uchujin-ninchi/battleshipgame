@@ -447,9 +447,13 @@ class main {
     }
   }
 
-  public static void stateWinner() {
-
-  }
+    public static void stateWinner() {
+        if(winner == 1){
+            System.out.println("You win");
+        }else if(winner == 0){
+            System.out.println("You lose");
+        }
+    }
 
   public static boolean end() {
 
