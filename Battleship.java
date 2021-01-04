@@ -42,9 +42,25 @@ public class Battleship {
 
     public static void flee (int desX, int desY) {
         if (isMovable(desX, desY)) {
+            String dir = "";
+            int d = 0;
+            if (desX > posX) {
+                dir = "東";
+                d = desX - posX;
+            } else if (desX < posX) {
+                dir = "西";
+                d = posX - desX;
+            } else if (desY > posY) {
+                dir = "南";
+                d = desY - posY;
+            } else if (desY < posY) {
+                dir = "北";
+                d = posY - desY;
+            }
             this.getMap.setMap(this.posX,this.posY) == MasuData.TYPE_VOID;
             this.setPos({desX, desY});
             this.getMap.setMap(desX,desY) == MasuData.TYPE_SHIP;
+            System.out.println("Moved " + dir + d);
         }
     }
     
