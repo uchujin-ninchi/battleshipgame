@@ -8,11 +8,15 @@ class main {
   public static final int TYPE_CORNER = 0;
   public static final int TYPE_SIDE = 1;
 
+  public static final int TYPE_NAKAMA = 0;
+  public static final int TYPE_TEKI = 1;
+
   public static final int POS_A = 0;
   public static final int POS_B = 1;
   public static final int POS_C = 2;
   public static final int POS_D = 3;
   public static final int POS_E = 4;
+  public static final int MAP_SIZE = 5;
 
   public static final int TYPE_MISSED = 0;
   public static final int TYPE_NEAR = 1;
@@ -29,9 +33,15 @@ class main {
 
   public static int theirNearAttack = 0;
   public static int ourNearAttack = 0;
+  
   public static int turn = 1;
+  
   public static int[] lastCounterNearPattern = new int[3];
+  public static int myLatestMove = 0;
+  public static int lastHitShip = 0;
+  
   public static int attacked = 0;
+  public static int countIni = 0;
   public static int winner = 0;
 
   public static final int[][] startPos = {{POS_A,0},
@@ -40,8 +50,8 @@ class main {
                                           {POS_E,4}};
 
   public static void initialize() {
-    myMap = new Masu(5, 5);
-    theirMap = new Masu(5, 5);
+    myMap = new Masu(MAP_SIZE, MAP_SIZE);
+    theirMap = new Masu(MAP_SIZE, MAP_SIZE);
 
     myShips = new Battleship[4];
     theirShips = new Battleship[4];
@@ -85,6 +95,25 @@ class main {
     }
   }
 
+  public static void myInitialAttack(int count) {
+    if (countIni == 0) {
+      int[][] dl = {{POS_B,1},{POS_B,3},{POS_D,1},{POS_D,3}};
+      int[] tmp;
+      //shuffle
+      for (int i=0; i<dl.length; i++) {
+          int r = (int)(Math.random()*dl.length);
+          tmp = dl[i];
+          dl[i] = dl[r];
+          dl[r] = tmp;
+      }
+    }
+    attack(dl[count]);
+    countIni++;
+    if (countIni == 3) {
+      countIni = 0;
+    }
+  }
+
   public static void theirActions() {
     System.err.print("Input opponent's action (Attack = 1, Flee = 0): ");
     int action = sc.nextInt;
@@ -95,7 +124,10 @@ class main {
       theyAttacked.add(atkPos);
 
       theirMap.setMap(atkPos[0], atkPos[1], MasuData.TYPE_VOID);
-      theirMap.raiseSurroundingsAv(atkPos[0], atkPos[1], 1);
+      ArrayList<int[]> sur = setSurroundingPos(atkPos, MasuData.surrounding, 8);
+      for (int i=0; i<8; i++) {
+        theirMap.raiseAvMap(sur.get(i)[0], sur.get(i)[1], 1);        
+      }
       theirEarlierAttack = theirLastAttack;
       checkAttackedPos(atkPos);
 
@@ -106,10 +138,6 @@ class main {
 
 
     }
-  }
-
-  public static void myActions() {
-
   }
 
   public static int[] interpretPos(String str) {
@@ -158,12 +186,70 @@ class main {
     }
   }
 
+  public static boolean hasMyShip(int[] pos){
+    boolean check =  false;
+    if(myMap.getMap(pos[0], pos[1]) == MasuData.TYPE_SHIP){
+      check = true;
+    }
+    return check;
+  }
+
+  public static void hitAttacked (int[] pos) {
+    System.out.println("Say 命中");
+    printTheirAvMap();
+    lastHitShip = checkWhichShip(pos);
+    int curHP = myShips[hitShip].getHP;
+    myShips[hitShip].setHP = curHP - 1;
+
+    if (myLatestMove==TYPE_HIT) {
+      attack(latestHitPos);
+    } else {
+      if (turn%2 == 1) {fleeFromHitPattern1(pos);}
+      else {fleeFromHitPattern0(pos);}      
+    }
+  }
+
+  public static void fleeFromHitPattern0(int[] pos) {
+    int[][] moveRange = new int[24][2];
+    int k=0;
+    while (k<24) {
+      for (int i=-2; i<3; i++) {
+        for (int j=-2; j<3; j++) {
+          if (!(i=0 && j=0)) {
+            moveRange[k][0] = j;
+            moveRange[k][1] = i;
+            k++;
+          }
+        }
+      }
+    }
+
+    ArrayList<int[]> surroundingPos = setSurroundingPos(pos, moveRange, 24);
+    ArrayList<int> nearShip = new ArrayList<int>();
+    for (int i=0; i<8; i++) {
+      if (myMap.getMap(surroundingPos.get(i)[0],surroundingPos.get(i)[1]) == 1) {
+        nearShip.add(checkWhichShip(surroundingPos.get(i)))
+      }
+    }
+
+    int n = int(nearShip.size()*Math.random());
+    int nearShipNo = nearShip.get(n);
+
+    int dx = myShips[nearShipNo].getPos()[0] - myShips[lastHitShip].getPos()[0];
+    int dy = myShips[nearShipNo].getPos()[1] - myShips[lastHitShip].getPos()[1];
+
+    if (dx<dy) {
+      dy = 0;
+    }
+
+    int[] desPos = {myShips[nearShipNo].getPos()[0]+dx, myShips[nearShipNo].getPos()[1])+dy}
+  }
+
   public static boolean nearMyShip (int[] pos) {
     boolean ans = false;
+    int[][] sur = setSurroundingPos(pos, MasuData.surrounding, 8);
     for (int i=0; i<8; i++) {
-      int surX = pos[0] + MasuData.surrounding[i][0];
-      int surY = pos[1] + MasuData.surrounding[i][1];
-      if (myMap.getMap(surX,surY) == MasuData.TYPE_SHIP) {
+      if (myMap.getMap(sur[i][0],sur[i][1]) == MasuData.TYPE_SHIP) {
         ans = true;
         break;
       }
@@ -173,11 +259,25 @@ class main {
 
   public static void nearAttacked (int[] pos) {
     System.out.println("Say 波高し");
+    
     printTheirAvMap();
     theirNearAttack++;
 
-    if (turn%2 == 1) {counterNearPattern1(pos);}
-    else {counterNearPattern0(pos);}
+    ArrayList<int[]> sur = setSurroundingPos(pos, MasuData.surrounding, 8);
+    ArrayList<int[]> attackablePos = new ArrayList<int[2]>();
+    for (int i=0; i<sur.size(); i++) {
+      int Av = getAv(sur.get(i)[0], sur.get(i)[1]);
+      if (Av>3) {
+        attackablePos.add(sur.get(i));
+      }
+    }
+
+    if (attackablePos.size() < 1) {
+      if (turn%2 == 1) {counterNearPattern1(pos);}
+      else {counterNearPattern0(pos);}
+    } else {
+      attackFrom(attackablePos);
+    }
   }
 
   public static void counterNearPattern1 (int[] pos) {
@@ -195,10 +295,10 @@ class main {
     int pattern = int(2*Math.random());
     lastCounterNearPattern[1]=pattern;
     int[][] setdSIDE = {MasuData.surrounding[2], MasuData.surrounding[4], MasuData.surrounding[5], MasuData.surrounding[7]};
-    int[][] setPosSIDE = setSurroundingPos(pos, setdSIDE, 4);
+    ArrayList<int[]> setPosSIDE = setSurroundingPos(pos, setdSIDE, 4);
 
     int[] setdCORNER = {MasuData.surrounding[1], MasuData.surrounding[3], MasuData.surrounding[6], MasuData.surrounding[8]};
-    int[][] setPosCORNER = setSurroundingPos(pos, setdCORNER, 4);
+    ArrayList<int[]> setPosCORNER = setSurroundingPos(pos, setdCORNER, 4);
 
     attacked = 0;
     if (pattern = TYPE_SIDE) {
@@ -216,7 +316,7 @@ class main {
     }
   }
 
-  public static boolean attackable (int[] pos) {
+  public static boolean isAttackable (int[] pos) {
     boolean ans = false;
     for (int i=0; i<8; i++) {
       int[] checkPos = new int[2];
@@ -233,14 +333,14 @@ class main {
     return ans;
   }
 
-  public static void attackFrom (int[][] setPos) {
-    int[] chosen = new int[4];
+  public static void attackFrom (ArrayList<int[]> setPos) {
+    int[] chosen = new int[setPos.size()];
     int n=0;
     do {
       n = int(4*Math.random());
       if (chosen[n]==0) {
         chosen[n] = 1;
-        if (attackable(setPos[n])) {
+        if (isAttackable(setPos[n])) {
           attack(setPos[n]);
           attacked = 1;
           break;
@@ -253,42 +353,39 @@ class main {
   }
 
   public static void attack (int[] pos) {
-    System.out.println("Attack " + pos);
-    System.out.print("Result? ");
-    int result = sc.nextLine();
-    if (result == TYPE_HIT) {
-      hitAttack(pos);
-    } else if (result == TYPE_NEAR) {
-      nearAttack(pos);
-    } else if (result == TYPE_MISSED) {
-      missedAttack(pos);
+    if (isAttackable(pos)) {
+      System.out.println("Attack " + pos);
+      System.out.print("Result? ");
+      int result = sc.nextLine();
+      if (result == TYPE_HIT) {
+        myLatestMove = TYPE_HIT;
+        hitAttack(pos);
+      } else if (result == TYPE_NEAR) {
+        myLatestMove = TYPE_NEAR;
+        nearAttack(pos);
+      } else if (result == TYPE_MISSED) {
+        myLatestMove = TYPE_MISSED;
+        missedAttack(pos);
+      }
     }
   }
 
   public static void fleeFromNearAttack (pos) {
     lastCounterNearPattern[0] = TYPE_FLEE;
 
-    int[][] surroundingPos = setSurroundingPos(pos, MasuData.surrounding, 8);
+    ArrayList<int[]> surroundingPos = setSurroundingPos(pos, MasuData.surrounding, 8);
     ArrayList<int> nearShip = new ArrayList<int>();
     for (int i=0; i<8; i++) {
-      if (myMap.getMap(surroundingPos[i][0],surroundingPos[i][1]) == 1) {
-        for (int j=0; j<4; j++) {
-          if (myShips[j].getPos[0] == surroundingPos[i][0] && myShips[j].getPos[1] == surroundingPos[i][1]) {
-            nearShip.add(j);
-            break;
-          }
-        }
+      if (myMap.getMap(surroundingPos.get(i)[0],surroundingPos.get(i)[1]) == 1) {
+        checkWhichShip(surroundingPos.get(i));
       }
     }
 
     int n = int(nearShip.size()*Math.random());
     fleeShipNo = nearShip.get(n);
 
-    flee(fleeShipNo,pos);
-  }
-
-  public static void flee (int shipNo, int[] destination) {
-    myShips[shipNo].setPos(destination);
+    myShips[fleeShipNo].flee(pos[0],pos[1]);
+    myLatestMove = TYPE_FLEE;
   }
 
   public static void missedAttacked (int[] pos) {
@@ -300,31 +397,41 @@ class main {
   }
 
   public static void fleeAfterMissedAttacked () {
-    int[][] surroundingPos = setSurroundingPos(pos, MasuData.surrounding, 8);
-    ArrayList<int> nearShip = new ArrayList<int>();
-    for (int i=0; i<8; i++) {
-      if (myMap.getMap(surroundingPos[i][0],surroundingPos[i][1]) == 1) {
-        nearShip.add(checkWhichShip(surroundingPos[i]))
+    int[][] moveRange = new int[24][2];
+    int k=0;
+    while (k<24) {
+      for (int i=-2; i<3; i++) {
+        for (int j=-2; j<3; j++) {
+          if (!(i=0 && j=0)) {
+            moveRange[k][0] = j;
+            moveRange[k][1] = i;
+            k++;
+          }
+        }
       }
     }
-  }
-  private final int static;
-  static = 1;
-  public static boolean hitAttack (int[] pos) {
-    boolean check =  false;
-    if( static == HIT){
-      check = true;
-    }else{
-      check = false;
+
+    ArrayList<int[]> surroundingPos = setSurroundingPos(pos, moveRange, 24);
+    ArrayList<int> nearShip = new ArrayList<int>();
+    for (int i=0; i<8; i++) {
+      if (myMap.getMap(surroundingPos.get(i)[0],surroundingPos.get(i)[1]) == 1) {
+        nearShip.add(checkWhichShip(surroundingPos.get(i)))
+      }
     }
-    if(check == true){
-      System.err.print("" +pos);
-    }else{
-      break;
+
+    int n = int(nearShip.size()*Math.random());
+    fleeShipNo = nearShip.get(n);
+
+    myShips[fleeShipNo].flee(pos[0],pos[1]);
+    myLatestMove = TYPE_FLEE;
+  }
+
+  public static hitAttack () {
+
   }
 
   public static nearAttack () {
-    
+
   }
 
   public static missedAttack () {
@@ -366,11 +473,15 @@ class main {
     System.out.println(str);
   }
 
-  public static int[][] setSurroundingPos (int[] pos, int[][] dPos, int count) {
-    int[][] newPos = new int[count][2];
+  public static ArrayList<int[]> setSurroundingPos (int[] pos, int[][] dPos, int count) {
+    ArrayList<int[]> newPos = new ArrayList<int[2]>();
     for (int i=0; i<count; i++) {
-      newPos[i][0]=pos[0]+dPos[i][0];
-      newPos[i][1]=pos[1]+dPos[i][1];
+      if ((pos[0]+dPos[i][0])>=0 && (pos[1]+dPos[i][1])>=0 && (pos[0]+dPos[i][0])<MAP_SIZE && (pos[1]+dPos[i][1])<MAP_SIZE) {
+        int[] set = new int[2];
+        set[0]=pos[0]+dPos[i][0];
+        set[1]=pos[1]+dPos[i][1];
+        newPos.add(set);
+      }
     }
     return newPos;
   }
@@ -385,4 +496,5 @@ class main {
     }
     return ans;
   }
+
 }
