@@ -33,6 +33,9 @@ public class MasuData implements Initializable {
     public void raiseAv(int x, int y, int count){
         AvMap[y][x] += count;
     }
+    public void resetAv(int x, int y) {
+        AvMap[y][x] = 0;
+    }
 
     public void fillShipData(int type){
         for (int y=0; y<height; y++){
