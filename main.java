@@ -33,13 +33,13 @@ class main {
 
   public static int theirNearAttack = 0;
   public static int ourNearAttack = 0;
-  
+
   public static int turn = 1;
-  
+
   public static int[] lastCounterNearPattern = new int[3];
   public static int myLatestMove = 0;
   public static int lastHitShip = 0;
-  
+
   public static int attacked = 0;
   public static int countIni = 0;
   public static int winner = 0;
@@ -126,7 +126,7 @@ class main {
       theirMap.setMap(atkPos[0], atkPos[1], MasuData.TYPE_VOID);
       ArrayList<int[]> sur = setSurroundingPos(atkPos, MasuData.surrounding, 8);
       for (int i=0; i<8; i++) {
-        theirMap.raiseAvMap(sur.get(i)[0], sur.get(i)[1], 1);        
+        theirMap.raiseAv(sur.get(i)[0], sur.get(i)[1], 1);
       }
       theirEarlierAttack = theirLastAttack;
       checkAttackedPos(atkPos);
@@ -205,26 +205,12 @@ class main {
       attack(latestHitPos);
     } else {
       if (turn%2 == 1) {fleeFromHitPattern1(pos);}
-      else {fleeFromHitPattern0(pos);}      
+      else {fleeFromHitPattern0(pos);}
     }
   }
 
   public static void fleeFromHitPattern0(int[] pos) {
-    int[][] moveRange = new int[24][2];
-    int k=0;
-    while (k<24) {
-      for (int i=-2; i<3; i++) {
-        for (int j=-2; j<3; j++) {
-          if (!(i=0 && j=0)) {
-            moveRange[k][0] = j;
-            moveRange[k][1] = i;
-            k++;
-          }
-        }
-      }
-    }
-
-    ArrayList<int[]> surroundingPos = setSurroundingPos(pos, moveRange, 24);
+    ArrayList<int[]> surroundingPos = setMoveRange(pos);
     ArrayList<int> nearShip = new ArrayList<int>();
     for (int i=0; i<8; i++) {
       if (myMap.getMap(surroundingPos.get(i)[0],surroundingPos.get(i)[1]) == 1) {
@@ -240,9 +226,39 @@ class main {
 
     if (dx<dy) {
       dy = 0;
+      d = countStep(dx);
+      dx = d;
+    } else if (dy<dx) {
+      dx = 0;
+      d = countStep(dy);
+      dy = d;
     }
 
-    int[] desPos = {myShips[nearShipNo].getPos()[0]+dx, myShips[nearShipNo].getPos()[1])+dy}
+    int[] desPos = {myShips[nearShipNo].getPos()[0]+dx, myShips[nearShipNo].getPos()[1])+dy};
+    myShips[nearShipNo].flee(desPos[0], desPos[1]);
+    myLatestMove = TYPE_FLEE;
+  }
+  public static void fleeFromHitPattern1(int[] pos) {
+    ArrayList<int[]> surroundingPos = setMoveRange(pos);
+    int[] highestAvPos = new int[2];
+    int highestAv = 0;
+    for (int i=0; i<surroundingPos.size(); i++) {
+      if (theirMap.getAv(surroundingPos.get(i)[0], surroundingPos.get(i)[1]) >= highestAv) {
+        highestAvPos = surroundingPos.get(i);
+        highestAv = theirMap.getAv(highestAvPos[0], highestAvPos[1]);
+      }
+    }
+
+    myShips[nearShipNo].flee(highestAvPos[0], highestAvPos[1]);
+    myLatestMove = TYPE_FLEE;
+  }
+
+  public static int countStep (int d) {
+    if (d <= 2) {
+      return d;
+    } else if (d > 2) {
+      return 2;
+    }
   }
 
   public static boolean nearMyShip (int[] pos) {
@@ -259,7 +275,7 @@ class main {
 
   public static void nearAttacked (int[] pos) {
     System.out.println("Say 波高し");
-    
+
     printTheirAvMap();
     theirNearAttack++;
 
@@ -370,7 +386,7 @@ class main {
     }
   }
 
-  public static void fleeFromNearAttack (pos) {
+  public static void fleeFromNearAttack (int[] pos) {
     lastCounterNearPattern[0] = TYPE_FLEE;
 
     ArrayList<int[]> surroundingPos = setSurroundingPos(pos, MasuData.surrounding, 8);
@@ -396,22 +412,8 @@ class main {
     }
   }
 
-  public static void fleeAfterMissedAttacked () {
-    int[][] moveRange = new int[24][2];
-    int k=0;
-    while (k<24) {
-      for (int i=-2; i<3; i++) {
-        for (int j=-2; j<3; j++) {
-          if (!(i=0 && j=0)) {
-            moveRange[k][0] = j;
-            moveRange[k][1] = i;
-            k++;
-          }
-        }
-      }
-    }
-
-    ArrayList<int[]> surroundingPos = setSurroundingPos(pos, moveRange, 24);
+  public static void fleeAfterMissedAttacked (int[] pos) {
+    ArrayList<int[]> surroundingPos = setMoveRange(pos);
     ArrayList<int> nearShip = new ArrayList<int>();
     for (int i=0; i<8; i++) {
       if (myMap.getMap(surroundingPos.get(i)[0],surroundingPos.get(i)[1]) == 1) {
@@ -426,16 +428,28 @@ class main {
     myLatestMove = TYPE_FLEE;
   }
 
-  public static hitAttack () {
-
+  public static void hitAttack (int[] pos) {
+    raiseAv(pos[0], pos[1], 5);
+    setMap(pos[0], pos[1], MasuData.TYPE_SHIP);
   }
 
-  public static nearAttack () {
-
+  public static void nearAttack (int[] pos) {
+    resetAv(pos[0], pos[1]);
+    ArrayList<int[]> surroundingPos = setSurroundingPos(pos, MasuData.surrounding, 8);
+    for (int i=0; i<surroundingPos.size(); i++) {
+      int posX = surroundingPos.get(i)[0];
+      int posY = surroundingPos.get(i)[1];
+      raiseAv(posX,posY,1);
+    }
   }
 
-  public static missedAttack () {
-
+  public static void missedAttack (int[] pos) {
+    ArrayList<int[]> block = setSurroundingPos(pos, MasuData.surrounding, 8);
+    for (int i=0; i<block.size(); i++) {
+      int posX = block.get(i)[0];
+      int posY = block.get(i)[1];
+      resetAv(posX,posY);
+    }
   }
 
   public static int totalHP(Battleship[] team) {
@@ -446,7 +460,11 @@ class main {
   }
 
   public static void stateWinner() {
-
+    if(winner == 1){
+      System.out.println("You win");
+    }else if(winner == 0){
+      System.out.println("You lose");
+    }
   }
 
   public static boolean end() {
@@ -497,4 +515,22 @@ class main {
     return ans;
   }
 
+  public static ArrayList<int[]> setMoveRange (int[] pos) {
+    int[][] moveRange = new int[24][2];
+    int k=0;
+    while (k<24) {
+      for (int i=-2; i<3; i++) {
+        for (int j=-2; j<3; j++) {
+          if (!(i=0 && j=0)) {
+            moveRange[k][0] = j;
+            moveRange[k][1] = i;
+            k++;
+          }
+        }
+      }
+    }
+
+    ArrayList<int[]> surroundingPos = setSurroundingPos(pos, moveRange, 24);
+    return surroundingPos;
+  }
 }
