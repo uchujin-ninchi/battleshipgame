@@ -26,6 +26,7 @@ class main {
   public static Masu theirMap;
   public static Battleship[] myShips;
   public static Battleship[] theirShips;
+  public static int theirTotalHP = 4*3;
   public static ArrayList<int[]> theyAttacked = new ArrayList<int[]>();
   public static ArrayList<int[]> weAttacked = new ArrayList<int[]>();
   public static int theirLastAttack = 0;
@@ -138,6 +139,10 @@ class main {
 
 
     }
+
+    printTheirAvMap();
+    System.out.println(myShips);
+
   }
 
   public static int[] interpretPos(String str) {
@@ -196,7 +201,6 @@ class main {
 
   public static void hitAttacked (int[] pos) {
     System.out.println("Say 命中");
-    printTheirAvMap();
     lastHitShip = checkWhichShip(pos);
     int curHP = myShips[hitShip].getHP;
     myShips[hitShip].setHP = curHP - 1;
@@ -276,7 +280,6 @@ class main {
   public static void nearAttacked (int[] pos) {
     System.out.println("Say 波高し");
 
-    printTheirAvMap();
     theirNearAttack++;
 
     ArrayList<int[]> sur = setSurroundingPos(pos, MasuData.surrounding, 8);
@@ -431,6 +434,7 @@ class main {
   public static void hitAttack (int[] pos) {
     raiseAv(pos[0], pos[1], 5);
     setMap(pos[0], pos[1], MasuData.TYPE_SHIP);
+    theirTotalHP -= 1;
   }
 
   public static void nearAttack (int[] pos) {
@@ -472,7 +476,7 @@ class main {
     if (totalHP(myShips) == 0) {
       winner = 0;
       return true;
-    } else if (totalHP(theirShips) == 0) {
+    } else if (theirTotalHP == 0) {
       winner = 1;
       return true;
     } else {
@@ -481,14 +485,36 @@ class main {
   }
 
   public static void printTheirAvMap(){
-    String str = "Their availability map:   ";
+    String str = "Their availability map: " + "A B C D E" + "\n";
     for (int y=0; y<theirMap.getHeight; y++) {
+      str += "                        " + y + " ";
       for (int x=0; x<theirMap.getWidth; x++) {
         str += theirMap.getAv(x,y) + " ";
       }
       str += "\n";
     }
+    str += ("Their total HP: " + totalHP(theirShips));
     System.out.println(str);
+  }
+
+  public static void printOurMap() {
+    String str = "Our current map: " + "A B C D E" + "\n";
+    for (int y=0; y<this.map.getHeight; y++) {
+      str += "                " + y + " ";
+      for (int x=0; x<this.map.getWidth; x++) {
+        if (myMap.getMap(x,y) == MasuData.TYPE_SHIP) {
+          int [] pos = {x,y};
+          int shipNo = checkWhichShip(pos);
+          str += myShips[shipNo].getHP() + " ";
+        } else {
+          str += "-" + " ";
+        }
+      }
+      str += "\n"
+          +  "                "
+          +  "--------------------";
+    }
+    System.out.println(str);;
   }
 
   public static ArrayList<int[]> setSurroundingPos (int[] pos, int[][] dPos, int count) {
