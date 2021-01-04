@@ -308,13 +308,23 @@ class main {
       }
     }
   }
-
-  public static hitAttack () {
-
+  private final int static;
+  static = 1;
+  public static boolean hitAttack (int[] pos) {
+    boolean check =  false;
+    if( static == HIT){
+      check = true;
+    }else{
+      check = false;
+    }
+    if(check == true){
+      System.err.print("" +pos);
+    }else{
+      break;
   }
 
   public static nearAttack () {
-
+    
   }
 
   public static missedAttack () {
